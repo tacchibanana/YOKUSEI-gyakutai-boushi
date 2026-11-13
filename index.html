@@ -1,0 +1,381 @@
+<title>拘束ゼロ・虐待防止ノート</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<style>
+/* Layout: one column app shell. Status board on top, tabbed workspaces below, output panes ready to copy. */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#1d2a33; --muted:#5b6b72; --line:#d6dedc;
+  --accent:#2c6e63; --accent-soft:#e2efec; --ok:#2e7d4f; --ok-soft:#e3f2e8;
+  --warn:#9a6200; --warn-soft:#fbf0d9; --bad:#b3362c; --bad-soft:#fbe6e3;
+  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b1f; --surface:#1c252a; --ink:#e4ecea; --muted:#9db0b2; --line:#2f3d42;
+  --accent:#6fc2b2; --accent-soft:#1f3a36; --ok:#7fd19f; --ok-soft:#1c3427;
+  --warn:#f0b955; --warn-soft:#3a2f17; --bad:#f08a7e; --bad-soft:#3e2220; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b1f; --surface:#1c252a; --ink:#e4ecea; --muted:#9db0b2; --line:#2f3d42;
+  --accent:#6fc2b2; --accent-soft:#1f3a36; --ok:#7fd19f; --ok-soft:#1c3427;
+  --warn:#f0b955; --warn-soft:#3a2f17; --bad:#f08a7e; --bad-soft:#3e2220; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7}
+.wrap{max-width:960px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px}
+h1{font-family:var(--f-display);font-weight:900;font-size:1.6rem;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1 small{display:block;font-family:var(--f-body);font-weight:400;font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+h2{font-family:var(--f-display);font-size:1.15rem;margin:0}
+h3{font-size:1rem;margin:0}
+.facility{font-size:.85rem;color:var(--muted)}
+.facility input{width:12em}
+.proto{font-size:.75rem;background:var(--warn-soft);color:var(--warn);padding:2px 10px;border-radius:99px;font-weight:700}
+nav{display:flex;gap:4px;flex-wrap:wrap;border-bottom:2px solid var(--line)}
+nav button{font:inherit;font-weight:700;background:none;border:0;padding:10px 14px;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.status{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.st{border:1px solid var(--line);border-left:6px solid var(--muted);border-radius:8px;background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.st.ok{border-left-color:var(--ok)} .st.warn{border-left-color:var(--warn)} .st.bad{border-left-color:var(--bad)}
+.st .lbl{font-size:.8rem;color:var(--muted)}
+.st .val{font-weight:700}
+.pill{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 9px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.mute{background:var(--accent-soft);color:var(--accent)}
+.law{font-size:.8rem;color:var(--muted)}
+label{font-size:.85rem;font-weight:700;display:flex;flex-direction:column;gap:4px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+textarea{min-height:76px;resize:vertical}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.req{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.req.on{border-color:var(--ok);background:var(--ok-soft)}
+.req .head{display:flex;gap:10px;align-items:flex-start;font-weight:700}
+.req input[type=checkbox]{width:20px;height:20px;flex:none;margin-top:3px;accent-color:var(--ok)}
+.req .def{font-size:.82rem;color:var(--muted);font-weight:400}
+.verdict{padding:10px 14px;border-radius:8px;font-weight:700}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)} .verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;border-radius:6px;padding:9px 16px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--surface)}
+.btn.sub{background:transparent;color:var(--accent)}
+.out{white-space:pre-wrap;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:14px;font-size:.88rem;overflow-x:auto;min-height:60px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:700;font-size:.8rem}
+.tbl{overflow-x:auto}
+.num{font-variant-numeric:tabular-nums}
+.chk{display:flex;flex-direction:column;gap:6px}
+.chk li{list-style:none;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0}
+.chk ul{padding:0;margin:0}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-size:.8rem;border:0;background:var(--surface);color:var(--muted);padding:5px 10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--warn)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:99px;font-size:.85rem}
+.note{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (prefers-reduced-motion:no-preference){.btn,.req{transition:background .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+<header>
+  <h1><small>身体拘束適正化・高齢者虐待防止の記録と委員会</small>拘束ゼロ・虐待防止ノート</h1>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <span class="proto">試作版・入力例が入っています</span>
+    <span class="facility"><input id="fac" aria-label="施設名" value="（例）特別養護老人ホーム さくら"></span>
+  </div>
+</header>
+
+<nav role="tablist">
+  <button role="tab" data-tab="home" aria-selected="true">体制チェック</button>
+  <button role="tab" data-tab="case" aria-selected="false">拘束の検討・記録</button>
+  <button role="tab" data-tab="mtg" aria-selected="false">委員会・研修</button>
+  <button role="tab" data-tab="self" aria-selected="false">ケアのセルフチェック</button>
+</nav>
+
+<!-- ===== 体制チェック ===== -->
+<section class="panel" id="p-home">
+  <div class="card">
+    <h2>減算にならないための体制</h2>
+    <p class="law">令和6年度介護報酬改定。身体拘束廃止未実施減算と高齢者虐待防止措置未実施減算は、どちらも所定単位数の1%を利用者全員から減算します。下の記録から自動で判定します。</p>
+    <h3>身体的拘束等の適正化</h3>
+    <div class="status" id="st-kousoku"></div>
+    <h3>高齢者虐待の防止</h3>
+    <div class="status" id="st-gyakutai"></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>指針と担当者</h2>
+      <label><span><input type="checkbox" id="g-kousoku" style="width:auto"> 身体的拘束等の適正化のための指針を整備している</span></label>
+      <label><span><input type="checkbox" id="g-gyakutai" style="width:auto"> 虐待の防止のための指針を整備している</span></label>
+      <label>虐待防止の担当者<input id="tantou" placeholder="氏名・職種"></label>
+    </div>
+    <div class="card">
+      <h2>拘束中の方の見直し</h2>
+      <div id="review"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 拘束の検討・記録 ===== -->
+<section class="panel" id="p-case" hidden>
+  <div class="card">
+    <h2>1. 検討する行為</h2>
+    <div class="row">
+      <label>利用者（イニシャル・居室など）<input id="c-name" value="（例）A様 203号室"></label>
+      <label>行為（手引きの例示から選ぶ）<select id="c-act"></select></label>
+    </div>
+    <label>その行為が必要と考えた状況<textarea id="c-situ">（例）夜間にベッドから立ち上がろうとして2回転倒。右大腿骨の手術歴あり。</textarea></label>
+    <label>試した代わりの方法（非代替性の検討）<textarea id="c-alt">（例）低床ベッドと衝撃吸収マット、センサーマット、夜間の巡回を30分ごとに増やした。</textarea></label>
+  </div>
+  <div class="card">
+    <h2>2. 緊急やむを得ない場合の三つの要件</h2>
+    <p class="law">三つすべてを満たし、本人・家族・関係者で確認して記録します。担当職員個人ではなく、事業所全体で判断します。</p>
+    <div id="reqs" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+  <div class="card">
+    <h2>3. 組織での判断と家族への説明</h2>
+    <div class="row">
+      <label>判断した会議・日付<input id="c-mdate" type="date" value="2026-11-10"></label>
+      <label>参加者<input id="c-member" value="（例）施設長、看護師、介護主任、相談員"></label>
+    </div>
+    <div class="row">
+      <label>拘束の時間帯<input id="c-time" value="（例）22時〜翌6時"></label>
+      <label>予定期間<input id="c-period" value="（例）2週間（11/24まで）"></label>
+      <label>説明した日・説明者<input id="c-explain" value="（例）11/10 相談員より長女様へ"></label>
+    </div>
+    <label>本人・家族の意見<textarea id="c-family">（例）長女様より「転倒が心配。できるだけ短い期間にしてほしい」</textarea></label>
+    <p class="law">家族の同意は、身体拘束を認める根拠にはなりません。実際に行う時点でも、必ず個別に説明します。</p>
+  </div>
+  <div class="card">
+    <h2>4. 経過観察と再検討</h2>
+    <p class="law">要件に当たるかを常に観察・再検討し、当たらなくなったら直ちに解除します。記録は2年間保存します。</p>
+    <div class="row">
+      <label>日時<input id="o-dt" type="datetime-local" value="2026-11-12T23:00"></label>
+      <label>態様と時間<input id="o-mode" value="（例）サイドレール4点 22:00〜6:00"></label>
+      <label>再検討の結果<select id="o-res"><option>継続</option><option>一時解除して観察</option><option>解除</option></select></label>
+    </div>
+    <label>その際の心身の状況<textarea id="o-state">（例）入眠は23時ごろ。0時に一度覚醒、レールにつかまり起き上がろうとする。表情は穏やか。</textarea></label>
+    <div class="btns"><button class="btn" id="o-add">経過を追加</button></div>
+    <div class="tbl"><table><thead><tr><th>日時</th><th>態様と時間</th><th>心身の状況</th><th>結果</th></tr></thead><tbody id="o-list"></tbody></table></div>
+  </div>
+  <div class="card">
+    <h2>説明書・経過観察記録</h2>
+    <div class="out" id="c-out"></div>
+    <div class="btns"><button class="btn" data-copy="c-out">記録をコピー</button><button class="btn sub" id="c-save">この記録を保存</button></div>
+  </div>
+</section>
+
+<!-- ===== 委員会・研修 ===== -->
+<section class="panel" id="p-mtg" hidden>
+  <div class="grid2">
+    <div class="card">
+      <h2>委員会の議事録</h2>
+      <div class="row">
+        <label>委員会<select id="m-kind"><option value="k">身体的拘束等適正化検討委員会</option><option value="g">虐待防止検討委員会</option><option value="both">合同開催</option></select></label>
+        <label>開催日<input id="m-date" type="date" value="2026-11-10"></label>
+      </div>
+      <label>参加者<input id="m-member" value="（例）施設長、看護師、介護主任、相談員、ケアマネジャー"></label>
+      <label>議題<textarea id="m-agenda">（例）・拘束中1名（A様）の継続要否
+・10月の不適切ケアセルフチェック結果
+・12月の研修内容</textarea></label>
+      <label>議事概要・決定事項<textarea id="m-sum">（例）A様のサイドレールは11/24に解除を目標。センサーマットの位置を変更。セルフチェックで「声かけなしの介助」が多く、12月研修のテーマにする。</textarea></label>
+      <label>職員への周知方法<input id="m-share" value="（例）各フロアの申し送りで説明、議事録を休憩室に掲示"></label>
+      <div class="btns"><button class="btn" id="m-add">議事録を保存</button></div>
+    </div>
+    <div class="card">
+      <h2>研修の記録</h2>
+      <div class="row">
+        <label>テーマ<select id="t-kind"><option value="k">身体拘束の適正化</option><option value="g">虐待の防止</option><option value="both">両方</option></select></label>
+        <label>実施日<input id="t-date" type="date" value="2026-10-15"></label>
+      </div>
+      <label>内容<input id="t-body" value="（例）不適切ケアの具体例と声かけの工夫"></label>
+      <label>受講者数<input id="t-num" type="number" min="0" value="18"></label>
+      <div class="btns"><button class="btn" id="t-add">研修を保存</button></div>
+      <p class="law">解釈通知の例示では、身体拘束の研修は年2回以上、虐待防止の研修は年1回以上です。新しく採用した職員にも実施します。</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2>開催・実施の履歴</h2>
+    <div class="tbl"><table><thead><tr><th>日付</th><th>種類</th><th>内容</th><th></th></tr></thead><tbody id="hist"></tbody></table></div>
+  </div>
+  <div class="card">
+    <h2>議事録の出力</h2>
+    <div class="out" id="m-out"></div>
+    <div class="btns"><button class="btn" data-copy="m-out">議事録をコピー</button></div>
+  </div>
+</section>
+
+<!-- ===== セルフチェック ===== -->
+<section class="panel" id="p-self" hidden>
+  <div class="card">
+    <h2>不適切ケアのセルフチェック（無記名）</h2>
+    <p class="law">この1か月の自分のケアを振り返ります。名前は記録しません。結果は施設全体の集計にだけ使い、研修のテーマを決める材料にします。</p>
+    <div class="chk"><ul id="sc"></ul></div>
+    <div class="btns"><button class="btn" id="sc-send">回答を集計に加える</button></div>
+  </div>
+  <div class="card">
+    <h2>施設全体の集計 <span class="pill mute" id="sc-n"></span></h2>
+    <div id="sc-sum" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+  <div class="card">
+    <h2>虐待の5つの類型</h2>
+    <div class="tbl"><table><tbody>
+      <tr><th>身体的虐待</th><td>身体に外傷が生じる、またはそのおそれのある暴行を加えること。正当な理由のない身体拘束を含む</td></tr>
+      <tr><th>介護等放棄</th><td>著しい減食や長時間の放置など、養護を著しく怠ること</td></tr>
+      <tr><th>心理的虐待</th><td>著しい暴言や拒絶的な対応など、著しい心理的外傷を与える言動</td></tr>
+      <tr><th>性的虐待</th><td>わいせつな行為をすること、またはさせること</td></tr>
+      <tr><th>経済的虐待</th><td>財産を不当に処分すること、不当に財産上の利益を得ること</td></tr>
+    </tbody></table></div>
+    <p class="law">緊急やむを得ない場合の手続きを経ていない身体拘束は、原則として高齢者虐待に当たり、市町村への相談・通報が必要です。</p>
+  </div>
+</section>
+
+<p class="note">出典：厚生労働省「介護施設・事業所等で働く方々への身体拘束廃止・防止の手引き」（令和6年3月）、令和6年度介護報酬改定の減算要件（各自治体の集団指導資料）、高齢者虐待防止法。本アプリは記録と委員会運営を補助するもので、身体拘束の可否を判断するものではありません。判断は施設の委員会で行ってください。データはこの端末のブラウザにだけ保存されます。</p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const ACTS=["一人歩きしないように、車いすやいす、ベッドに体幹や四肢をひも等で縛る","転落しないように、ベッドに体幹や四肢をひも等で縛る","自分で降りられないように、ベッドを柵（サイドレール）で囲む","点滴・経管栄養等のチューブを抜かないように、四肢をひも等で縛る","チューブを抜かない、皮膚をかきむしらないように、ミトン型の手袋等をつける","車いすやいすからずり落ちたり立ち上がったりしないように、Y字型拘束帯や腰ベルト、車いすテーブルをつける","立ち上がる能力のある人の立ち上がりを妨げるようないすを使用する","脱衣やオムツはずしを制限するために、介護衣（つなぎ服）を着せる","他人への迷惑行為を防ぐために、ベッド等に体幹や四肢をひも等で縛る","行動を落ち着かせるために、向精神薬を過剰に服用させる","自分の意思で開けることのできない居室等に隔離する","その他（自由記載）"];
+const REQS=[["切迫性","本人または他の入所者（利用者）等の生命または身体が危険にさらされる可能性が著しく高いこと","（例）転倒を繰り返し、骨折の危険が著しく高い"],["非代替性","身体拘束その他の行動制限を行う以外に代替する方法がないこと","（例）低床ベッド・マット・センサー・巡回強化でも転倒が防げなかった"],["一時性","身体拘束その他の行動制限が一時的なものであること","（例）夜間のみ、2週間を上限に毎日再検討する"]];
+const SC=["声かけをせずに介助を始めたことがある","「ちょっと待って」と言ったまま、長く待たせたことがある","友達言葉や子ども扱いの言葉づかいをしたことがある","本人の前で、本人のことを他の職員と話したことがある","ナースコールを手の届かない所に置いたことがある","食事を急がせたり、本人のペースを待たずに介助したことがある","排泄の失敗を責めるような言い方をしたことがある","他の職員の不適切なケアを見て、何も言えなかったことがある"];
+const today=new Date("2026-11-13");
+const LS="kousoku_note_v1";
+let S={cases:[],obs:[],hist:[],self:[],g:{k:true,g:true,tantou:"（例）介護主任 山田"},reqs:[true,true,true],reqText:["","",""]};
+// sample history so the board opens in a working state
+S.hist=[{d:"2026-08-20",type:"mtg",kind:"both",body:"拘束中の方の確認、身体拘束ゼロ宣言の掲示"},{d:"2026-11-10",type:"mtg",kind:"both",body:"A様の継続要否、セルフチェック結果"},{d:"2026-04-22",type:"tr",kind:"both",body:"新任職員向け 身体拘束・虐待防止の基本"},{d:"2026-10-15",type:"tr",kind:"k",body:"不適切ケアの具体例と声かけの工夫"}];
+S.obs=[{dt:"2026-11-11T23:00",mode:"サイドレール4点 22:00〜6:00",state:"0時に覚醒し起き上がろうとする。表情穏やか",res:"継続"}];
+S.self=[[1,1,0,0,0,1,0,1],[1,0,0,1,0,0,0,0],[1,1,1,0,0,0,0,1],[0,1,0,0,0,1,0,0],[1,0,0,0,1,0,0,0]];
+S.cases=[{name:"（例）A様 203号室",act:2,start:"2026-11-10",period:"2週間（11/24まで）",last:"2026-11-11T23:00",open:true}];
+try{const v=localStorage.getItem(LS);if(v)S=Object.assign(S,JSON.parse(v));}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=d=>{const x=new Date(d);return `${x.getFullYear()}/${x.getMonth()+1}/${x.getDate()}`};
+const days=d=>Math.floor((today-new Date(d))/864e5);
+function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1800);}
+
+/* tabs */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  ["home","case","mtg","self"].forEach(t=>$("p-"+t).hidden=t!==b.dataset.tab);
+});
+
+/* status board */
+function lastOf(type,kind){return S.hist.filter(h=>h.type===type&&(h.kind===kind||h.kind==="both")).map(h=>h.d).sort().pop();}
+function countYear(type,kind){const y=today.getFullYear();return S.hist.filter(h=>h.type===type&&(h.kind===kind||h.kind==="both")&&new Date(h.d).getFullYear()===y).length;}
+function st(lbl,val,cls,pill){return `<div class="st ${cls}"><span class="lbl">${lbl}</span><span class="val">${val}</span><span><span class="pill ${cls}">${pill}</span></span></div>`;}
+function renderStatus(){
+  const lk=lastOf("mtg","k"),dk=lk?days(lk):999,nk=lk?new Date(new Date(lk).getTime()+90*864e5):null;
+  const tk=countYear("tr","k");
+  $("st-kousoku").innerHTML=
+    st("委員会（3か月に1回以上）",lk?`前回 ${fmt(lk)}／次回期限 ${fmt(nk)}`:"記録なし",dk<=75?"ok":dk<=90?"warn":"bad",dk<=75?"開催済み":dk<=90?"期限が近い":"期限切れ")+
+    st("研修（年2回以上の例示）",`今年 ${tk}回`,tk>=2?"ok":tk===1?"warn":"bad",tk>=2?"実施済み":"あと"+(2-tk)+"回")+
+    st("指針の整備",S.g.k?"整備済み":"未整備",S.g.k?"ok":"bad",S.g.k?"OK":"要対応")+
+    st("拘束時の記録",S.cases.filter(c=>c.open).length?`拘束中 ${S.cases.filter(c=>c.open).length}名`:"拘束中の方なし","ok",S.cases.filter(c=>c.open).length?"記録を継続":"OK");
+  const lg=lastOf("mtg","g"),dg=lg?days(lg):999,tg=countYear("tr","g");
+  $("st-gyakutai").innerHTML=
+    st("委員会の定期開催",lg?`前回 ${fmt(lg)}`:"記録なし",dg<=180?"ok":dg<=365?"warn":"bad",dg<=180?"開催済み":"開催を計画")+
+    st("研修（年1回以上の例示）",`今年 ${tg}回`,tg>=1?"ok":"bad",tg>=1?"実施済み":"未実施")+
+    st("指針の整備",S.g.g?"整備済み":"未整備",S.g.g?"ok":"bad",S.g.g?"OK":"要対応")+
+    st("担当者の設置",S.g.tantou?esc(S.g.tantou):"未設置",S.g.tantou?"ok":"bad",S.g.tantou?"OK":"要対応");
+  const open=S.cases.filter(c=>c.open);
+  $("review").innerHTML=open.length?`<div class="tbl"><table><thead><tr><th>利用者</th><th>行為</th><th>最終の再検討</th></tr></thead><tbody>${open.map(c=>{const h=c.last?Math.floor((today-new Date(c.last))/36e5):999;return `<tr><td>${esc(c.name)}<br><span class="law">${esc(c.period)}</span></td><td>${esc(ACTS[c.act])}</td><td class="num">${c.last?fmt(c.last):"-"}<br><span class="pill ${h<=48?"ok":"bad"}">${h<=48?"見直し中":"再検討が必要"}</span></td></tr>`}).join("")}</tbody></table></div>`:`<p class="law">拘束中の方はいません。</p>`;
+}
+$("g-kousoku").checked=S.g.k;$("g-gyakutai").checked=S.g.g;$("tantou").value=S.g.tantou;
+$("g-kousoku").onchange=e=>{S.g.k=e.target.checked;save();renderStatus();};
+$("g-gyakutai").onchange=e=>{S.g.g=e.target.checked;save();renderStatus();};
+$("tantou").oninput=e=>{S.g.tantou=e.target.value;save();renderStatus();};
+
+/* case */
+$("c-act").innerHTML=ACTS.map((a,i)=>`<option value="${i}">${i<11?"❶❷❸❹❺❻❼❽❾❿⓫"[i]+" ":""}${a}</option>`).join("");
+$("c-act").value="2";
+$("reqs").innerHTML=REQS.map((r,i)=>`<div class="req" id="rq${i}"><div class="head"><input type="checkbox" id="rc${i}" aria-label="${r[0]}を満たす"><div>${r[0]}<div class="def">${r[1]}</div></div></div><label>判断の理由<input id="rt${i}" value="${r[2]}"></label></div>`).join("");
+REQS.forEach((r,i)=>{$("rc"+i).checked=S.reqs[i];$("rc"+i).onchange=()=>{S.reqs[i]=$("rc"+i).checked;save();renderCase();};$("rt"+i).oninput=renderCase;});
+["c-name","c-act","c-situ","c-alt","c-mdate","c-member","c-time","c-period","c-explain","c-family"].forEach(id=>$(id).addEventListener("input",renderCase));
+function renderCase(){
+  REQS.forEach((r,i)=>$("rq"+i).classList.toggle("on",$("rc"+i).checked));
+  const all=REQS.every((r,i)=>$("rc"+i).checked);
+  const v=$("verdict");v.className="verdict "+(all?"ok":"bad");
+  v.textContent=all?"三つの要件の確認が記録されています。委員会での判断と家族への説明に進んでください。":"満たしていない要件があります。身体拘束は行えません。代わりの方法を委員会で検討してください。";
+  const obs=S.obs.map(o=>`  ${o.dt.replace("T"," ")}｜${o.mode}｜${o.state}｜${o.res}`).join("\n")||"  （まだありません）";
+  $("c-out").textContent=
+`【緊急やむを得ない身体拘束に関する説明書・経過観察記録】
+施設名：${$("fac").value}
+利用者：${$("c-name").value}
+行為：${ACTS[$("c-act").value]}
+
+■ 必要と考えた状況
+${$("c-situ").value}
+■ 試した代わりの方法
+${$("c-alt").value}
+
+■ 三つの要件の確認
+${REQS.map((r,i)=>`・${r[0]}：${$("rc"+i).checked?"該当":"非該当"}　理由：${$("rt"+i).value}`).join("\n")}
+
+■ 組織での判断
+会議日：${$("c-mdate").value}　参加者：${$("c-member").value}
+時間帯：${$("c-time").value}　期間：${$("c-period").value}
+■ 本人・家族への説明
+${$("c-explain").value}
+意見：${$("c-family").value}
+
+■ 経過観察・再検討
+${obs}
+${all?"":"\n※要件を満たしていないため、身体拘束は行えません。"}`;
+  $("o-list").innerHTML=S.obs.map(o=>`<tr><td class="num">${o.dt.replace("T"," ")}</td><td>${esc(o.mode)}</td><td>${esc(o.state)}</td><td><span class="pill ${o.res==="解除"?"ok":o.res==="継続"?"warn":"mute"}">${o.res}</span></td></tr>`).join("");
+}
+$("o-add").onclick=()=>{S.obs.push({dt:$("o-dt").value,mode:$("o-mode").value,state:$("o-state").value,res:$("o-res").value});
+  const c=S.cases.find(c=>c.open);if(c){c.last=$("o-dt").value;if($("o-res").value==="解除")c.open=false;}save();renderCase();renderStatus();toast("経過を追加しました");};
+$("c-save").onclick=()=>{const name=$("c-name").value;let c=S.cases.find(x=>x.name===name);
+  if(!c){c={name,open:true};S.cases.push(c);} Object.assign(c,{act:+$("c-act").value,start:$("c-mdate").value,period:$("c-period").value,last:c.last||$("c-mdate").value});save();renderStatus();toast("記録を保存しました");};
+
+/* meetings & training */
+const KIND={k:"身体拘束",g:"虐待防止",both:"合同"};
+function renderHist(){
+  $("hist").innerHTML=S.hist.slice().sort((a,b)=>b.d.localeCompare(a.d)).map((h,i)=>`<tr><td class="num">${fmt(h.d)}</td><td><span class="pill ${h.type==="mtg"?"mute":"ok"}">${h.type==="mtg"?"委員会":"研修"}・${KIND[h.kind]}</span></td><td>${esc(h.body)}</td><td><button class="btn sub" style="padding:3px 10px" data-del="${S.hist.indexOf(h)}">削除</button></td></tr>`).join("");
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.hist.splice(+b.dataset.del,1);save();renderHist();renderStatus();});
+}
+function renderMtg(){
+  const k=$("m-kind").value;
+  $("m-out").textContent=
+`【${k==="k"?"身体的拘束等適正化検討委員会":k==="g"?"虐待防止検討委員会":"身体的拘束等適正化・虐待防止検討委員会（合同）"} 議事録】
+施設名：${$("fac").value}
+開催日時：${$("m-date").value}
+参加者：${$("m-member").value}
+
+■ 議題
+${$("m-agenda").value}
+
+■ 議事概要・決定事項
+${$("m-sum").value}
+
+■ 職員への周知
+${$("m-share").value}`;
+}
+["m-kind","m-date","m-member","m-agenda","m-sum","m-share","fac"].forEach(id=>$(id).addEventListener("input",()=>{renderMtg();renderCase();}));
+$("m-add").onclick=()=>{S.hist.push({d:$("m-date").value,type:"mtg",kind:$("m-kind").value,body:$("m-agenda").value.split("\n")[0].replace(/^・/,"")});save();renderHist();renderStatus();toast("議事録を保存しました");};
+$("t-add").onclick=()=>{S.hist.push({d:$("t-date").value,type:"tr",kind:$("t-kind").value,body:$("t-body").value+`（${$("t-num").value}名）`});save();renderHist();renderStatus();toast("研修を保存しました");};
+
+/* self check */
+let ans=SC.map(()=>0);
+function renderSelf(){
+  $("sc").innerHTML=SC.map((q,i)=>`<li><span>${q}</span><div class="seg" role="group" aria-label="${q}"><button aria-pressed="${ans[i]===0}" data-q="${i}" data-v="0">ない</button><button aria-pressed="${ans[i]===1}" data-q="${i}" data-v="1">ある</button></div></li>`).join("");
+  document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ans[+b.dataset.q]=+b.dataset.v;renderSelf();});
+  const n=S.self.length;$("sc-n").textContent=`回答 ${n}件`;
+  const rates=SC.map((q,i)=>({q,r:n?S.self.filter(a=>a[i]).length/n:0})).sort((a,b)=>b.r-a.r);
+  $("sc-sum").innerHTML=rates.map((x,i)=>`<div><div style="display:flex;justify-content:space-between;gap:10px;font-size:.88rem"><span>${x.q}</span><span class="num">${Math.round(x.r*100)}%</span></div><div class="bar"><span style="width:${x.r*100}%"></span></div></div>`).join("")+`<p class="law">「ある」が多い項目（上位：${esc(rates[0].q)}）を次の研修テーマの候補にします。</p>`;
+}
+$("sc-send").onclick=()=>{S.self.push(ans.slice());ans=SC.map(()=>0);save();renderSelf();toast("集計に加えました");};
+
+/* copy */
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const el=$(b.dataset.copy);
+  const done=()=>toast("コピーしました");
+  try{navigator.clipboard.writeText(el.textContent).then(done,()=>sel(el));}catch(e){sel(el);}});
+function sel(el){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);toast("選択しました。コピーしてください");}
+
+renderStatus();renderCase();renderHist();renderMtg();renderSelf();
+</script>
